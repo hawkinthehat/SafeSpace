@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeSpace Prototype</title>
+    <style>
+        :root {
+            --bg: #0a192f; --card: #112240; --teal: #64ffda; --red: #ff4d4d; --gold: #ffd700; --text: #ccd6f6;
+        }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; overflow: hidden; transition: 0.5s; }
+        
+        .screen { display: none; flex-direction: column; align-items: center; justify-content: center; height: 90vh; padding: 20px; text-align: center; }
+        .active { display: flex; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .btn { background: var(--card); border: 1px solid var(--teal); color: var(--teal); padding: 15px 30px; border-radius: 30px; cursor: pointer; margin: 10px; width: 220px; transition: 0.2s; }
+        .btn:active { transform: scale(0.95); }
+        .btn-sos { background: var(--red); color: white; border: none; font-weight: bold; font-size: 1.2rem; }
+        .btn-test { border-color: var(--gold); color: var(--gold); margin-top: 20px; font-size: 0.8rem; width: auto; }
+
+        /* BREATHING */
+        .breathe-circle { width: 150px; height: 150px; background: var(--teal); border-radius: 50%; opacity: 0.3; animation: b 12s infinite; }
+        @keyframes b { 0%, 100% { transform: scale(0.8); } 33%, 66% { transform: scale(1.3); } }
+
+        /* GAME */
+        #target { width: 50px; height: 50px; background: var(--gold); position: absolute; border-radius: 8px; cursor: pointer; display: none; }
+
+        /* UPSELL MODAL */
+        #upsell { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+
+        nav { height: 10vh; background: var(--card); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+    <div id="home" class="screen active">
+        <h1>SafeSpace</h1>
+        <button class="btn btn-sos" onclick="show('sos')">SOS: I'M PANICKING</button>
+        <button class="btn" onclick="show('map')">Body Tension Map</button>
+        <button class="btn" onclick="show('cbt')">Thought Fact-Check</button>
+        <button class="btn btn-test" onclick="simulateCrisis()">⚡ RUN CRISIS SIMULATION</button>
+    </div>
+
+    <div id="sos" class="screen">
+        <div class="breathe-circle"></div>
+        <h2 id="b-text">Breathe In...</h2>
+        <p>Focus on the expansion.</p>
+        <button class="btn" onclick="show('game')">I can't sit still</button>
+    </div>
+
+    <div id="game" class="screen">
+        <p>Grounding Exercise: Tap the square 5 times.</p>
+        <div id="target" onclick="hitTarget()"></div>
+    </div>
+
+    <div id="cbt" class="screen">
+        <h2>Fact-Checker</h2>
+        <textarea id="thought" placeholder="What's the 'What-If'?" style="width:80%; height:80px; margin-bottom:10px;"></textarea>
+        <button class="btn" onclick="triggerUpsell()">Analyze Thought</button>
+        <button class="btn" onclick="show('home')">Back</button>
+    </div>
+
+    <div id="upsell">
+        <h1 style="color:var(--gold)">SafeSpace Pro</h1>
+        <p style="width:80%">You've used the Fact-Checker. Want to save this reframe in your permanent Resilience Vault?</p>
+        <button class="btn" style="background:var(--teal); color:var(--bg)" onclick="alert('Proceeding to Stripe Checkout...')">Unlock for $4.99/mo</button>
+        <button class="btn" onclick="document.getElementById('upsell').style.display='none'">Maybe Later</button>
+    </div>
+
+    <nav>
+        <button onclick="show('home')">HOME</button>
+        <button onclick="show('sos')">SOS</button>
+    </nav>
+
+    <script>
+        let hits = 0;
+        function show(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('target').style.display = (id === 'game') ? 'block' : 'none';
+        }
+
+        // SIMULATION MODE
+        function simulateCrisis() {
+            document.body.style.backgroundColor = "#2c0000"; // Red tint for stress
+            alert("SIMULATION: High Heart Rate & Rapid Breathing Detected.");
+            show('sos');
+            let t = document.getElementById('b-text');
+            setInterval(() => {
+                let s = new Date().getSeconds() % 12;
+                t.innerText = s < 4 ? "IN..." : s < 8 ? "HOLD..." : "OUT...";
+            }, 1000);
+            setTimeout(() => { document.body.style.backgroundColor = "#0a192f"; }, 3000);
+        }
+
+        function moveTarget() {
+            const t = document.getElementById('target');
+            t.style.left = Math.random() * (window.innerWidth - 60) + "px";
+            t.style.top = Math.random() * (window.innerHeight - 150) + "px";
+        }
+
+        function hitTarget() {
+            hits++;
+            if (hits >= 5) {
+                hits = 0;
+                alert("Grounding complete. Heart rate lowering.");
+                show('home');
+            } else {
+                moveTarget();
+            }
+        }
+
+        function triggerUpsell() {
+            document.getElementById('upsell').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
