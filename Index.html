@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Defuse | Tactical Neutralization</title>
+    <style>
+        :root { --bg: #0f172a; --teal: #2dd4bf; --text: #f1f5f9; --card: #1e293b; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
+        .screen { display: none; min-height: 80vh; flex-direction: column; justify-content: center; align-items: center; }
+        .active { display: flex; }
+        .btn { background: var(--teal); color: var(--bg); border: none; padding: 20px; border-radius: 12px; width: 100%; max-width: 300px; font-weight: bold; font-size: 1.1rem; margin: 10px 0; cursor: pointer; }
+        .sos { background: #f43f5e; color: white; }
+        .task-box { background: var(--card); border: 2px solid var(--teal); padding: 30px; border-radius: 15px; margin: 20px; font-size: 1.4rem; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <div id="home" class="screen active">
+        <h1 style="color: var(--teal); letter-spacing: 4px;">DEFUSE</h1>
+        <button class="btn sos" onclick="show('sos')">SOS: BREATHING</button>
+        <button class="btn" onclick="nextTask()">START NEURAL HIJACK</button>
+        <button class="btn" onclick="show('ice')" style="background:none; color:var(--teal); border: 1px solid var(--teal);">ICE RESET</button>
+    </div>
+
+    <div id="hijack" class="screen">
+        <h2 style="color: var(--teal);">TASK IN PROGRESS</h2>
+        <div class="task-box" id="task-display">Focus on the prompt below.</div>
+        <button class="btn" onclick="nextTask()">NEXT TASK</button>
+        <button class="btn" onclick="show('home')" style="background:none; color:white; font-size: 0.8rem;">I FEEL STABLE</button>
+    </div>
+
+    <div id="sos" class="screen"><h2>Breathe Deeply...</h2><button class="btn" onclick="show('home')">BACK</button></div>
+    <div id="ice" class="screen"><h2>Apply Ice Now</h2><button class="btn" onclick="show('home')">BACK</button></div>
+
+    <script>
+        const tasks = [
+            "Find 3 things in the room that are made of WOOD.",
+            "Say the alphabet backwards starting from Z.",
+            "Look for something that is exactly the color ORANGE.",
+            "Subtract 7 from 100... what is the number? (Do it again).",
+            "Name 5 cities you have never visited.",
+            "Touch 3 different textures (Soft, Hard, Cold).",
+            "Describe the pattern on the floor out loud."
+        ];
+
+        function show(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function nextTask() {
+            show('hijack');
+            const display = document.getElementById('task-display');
+            const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
+            display.innerText = randomTask;
+        }
+    </script>
+</body>
+</html>
