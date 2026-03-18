@@ -17,15 +17,15 @@
         body { 
             background: var(--bg); 
             color: var(--text); 
-            font-family: sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             margin: 0; 
-            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .screen { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; min-height: 80vh; }
+        .screen { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; min-height: 85vh; box-sizing: border-box; }
         .active { display: flex; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -33,41 +33,49 @@
             background: var(--card); 
             border: 1px solid var(--teal); 
             color: var(--teal); 
-            padding: 15px 25px; 
-            border-radius: 30px; 
+            padding: 18px; 
+            border-radius: 15px; 
             cursor: pointer; 
-            margin: 10px; 
-            width: 250px; 
+            margin: 10px 0; 
+            width: 100%;
+            max-width: 300px;
             font-weight: bold;
+            font-size: 1rem;
             transition: 0.2s;
         }
-        .btn-sos { background: var(--red); color: white; border: none; font-size: 1.2rem; }
+        .btn-sos { background: var(--red); color: white; border: none; font-size: 1.2rem; box-shadow: 0 0 20px rgba(255, 77, 77, 0.3); }
         .btn-gold { border-color: var(--gold); color: var(--gold); }
 
-        /* BREATHING ANIMATION */
+        /* SOS BREATHING ANIMATION */
         .breathe-circle { 
-            width: 150px; height: 150px; 
+            width: 160px; height: 160px; 
             background: var(--teal); 
             border-radius: 50%; 
             opacity: 0.3; 
-            animation: breathe 12s infinite ease-in-out; 
+            animation: breathe 10s infinite ease-in-out; 
+            margin-bottom: 40px;
         }
         @keyframes breathe { 
             0%, 100% { transform: scale(0.8); opacity: 0.2; } 
-            40%, 60% { transform: scale(1.4); opacity: 0.5; } 
+            40%, 60% { transform: scale(1.5); opacity: 0.6; } 
         }
 
+        /* GAME GRID */
+        #game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+        .game-cell { background: var(--card); height: 80px; width: 80px; display: flex; align-items: center; justify-content: center; font-size: 2rem; border-radius: 15px; cursor: pointer; border: 1px solid rgba(100, 255, 218, 0.1); }
+
         nav { 
-            position: sticky; bottom: 0; width: 100%; 
+            position: fixed; bottom: 0; width: 100%; 
             background: var(--card); display: flex; 
             justify-content: space-around; padding: 15px 0;
             border-top: 1px solid rgba(100, 255, 218, 0.1);
+            z-index: 100;
         }
-        nav button { background: none; border: none; color: var(--text); cursor: pointer; opacity: 0.7; }
+        nav button { background: none; border: none; color: var(--text); cursor: pointer; opacity: 0.7; font-size: 0.8rem; }
 
         #tutorial-overlay {
             position: fixed; inset: 0; background: var(--bg); z-index: 1000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center;
         }
     </style>
 </head>
@@ -75,50 +83,68 @@
 
     <div id="tutorial-overlay">
         <h1 style="color: var(--teal);">SafeSpace</h1>
-        <p>This is your digital weighted blanket.</p>
-        <div style="text-align: left; margin: 20px 0;">
-            <p>🔴 <strong>SOS:</strong> Immediate panic help.</p>
-            <p>❄️ <strong>Reset:</strong> Physical "Dive Reflex" fix.</p>
-            <p>🧠 <strong>CBT:</strong> Fact-check anxious thoughts.</p>
+        <p>Built by Joe Ancheta Jr.</p>
+        <div style="text-align: left; margin: 30px 0; line-height: 1.6;">
+            <p>🔴 <strong>SOS:</strong> Immediate panic intervention.</p>
+            <p>❄️ <strong>Reset:</strong> Biological Vagus Nerve reset.</p>
+            <p>🎮 <strong>Focus:</strong> Interactive sensory distraction.</p>
+            <p>🔒 <strong>Vault:</strong> Private Resilience tracking.</p>
         </div>
-        <button class="btn" onclick="closeTutorial()">Start Healing</button>
+        <button class="btn" onclick="closeTutorial()">I'm Ready</button>
     </div>
 
     <div id="home" class="screen active">
-        <h1>Hello, Joe.</h1>
-        <p>How does your nervous system feel?</p>
-        <button class="btn btn-sos" onclick="show('sos')">SOS: I'M PANICKING</button>
+        <h1 style="font-weight: 300;">Hello, Joe.</h1>
+        <p style="opacity: 0.7; margin-bottom: 30px;">Choose your anchor:</p>
+        <button class="btn btn-sos" onclick="show('sos')">SOS: HELP ME BREATHE</button>
         <button class="btn" onclick="show('grounding')">5-4-3-2-1 Grounding</button>
         <button class="btn" onclick="show('icedive')">Emergency Ice Reset ❄️</button>
-        <button class="btn" onclick="show('cbt')">Thought Fact-Checker</button>
+        <button class="btn" onclick="startPatternGame()">Pattern Break Game 🎮</button>
+        <button class="btn btn-gold" onclick="show('cbt')">Thought Fact-Checker</button>
     </div>
 
     <div id="sos" class="screen">
         <div class="breathe-circle"></div>
         <h2 id="b-text">Breathe In...</h2>
-        <p>Follow the circle's expansion.</p>
-        <button class="btn" onclick="show('home')">I'm calmer now</button>
+        <p style="opacity:0.6;">Follow the motion. You are safe.</p>
+        <button class="btn" onclick="show('home')">I feel calmer</button>
     </div>
 
     <div id="grounding" class="screen">
-        <h2 id="g-title">Grounding</h2>
-        <p id="g-desc" style="font-size: 1.3rem; color: var(--teal);">Name 5 things you can SEE.</p>
-        <h1 id="g-count">5</h1>
-        <button class="btn" onclick="nextStep()">Next Sense</button>
+        <h2 id="g-title" style="color: var(--teal);">Grounding</h2>
+        <p id="g-desc" style="font-size: 1.3rem;">Name 5 things you can SEE.</p>
+        <h1 id="g-count" style="font-size: 4rem; margin: 10px 0;">5</h1>
+        <button class="btn" onclick="nextGrounding()">Next Sense</button>
+        <button class="btn" style="border:none; opacity:0.5;" onclick="show('home')">Exit</button>
     </div>
 
     <div id="icedive" class="screen">
-        <h2 style="color: #00f2ff;">System Reset</h2>
-        <p>Splash your face with ice water or hold an ice cube for 15 seconds.</p>
-        <h1 id="timer">15</h1>
-        <button class="btn" onclick="startIceTimer()">Start Timer</button>
-        <button class="btn" onclick="show('home')" style="border:none; opacity:0.5;">Cancel</button>
+        <h2 style="color: #00f2ff;">BIOLOGICAL RESET</h2>
+        <div style="background: rgba(0, 242, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 4px solid #00f2ff; text-align: left; margin-bottom: 20px;">
+            <p>1. Grab an ice cube or cold water.</p>
+            <p>2. Hold it or splash your face.</p>
+            <p>3. This triggers your 'Dive Reflex' to lower heart rate.</p>
+        </div>
+        <h1 id="timer" style="font-size: 4rem;">15</h1>
+        <button class="btn" onclick="startIceTimer()">Start 15s Timer</button>
+        <button class="btn" onclick="show('home')" style="border:none; opacity:0.5;">Back</button>
+    </div>
+
+    <div id="game" class="screen">
+        <div style="display: flex; justify-content: space-between; width: 100%; max-width: 300px;">
+            <span>Score: <span id="game-score">0</span></span>
+            <span id="game-timer" style="color: var(--teal);">10s</span>
+        </div>
+        <h3>Tap the Different Shape</h3>
+        <div id="game-grid"></div>
+        <button class="btn" onclick="show('home')" style="border:none; opacity:0.5;">Exit Game</button>
     </div>
 
     <div id="cbt" class="screen">
         <h2>Fact-Checker</h2>
-        <textarea id="thought" placeholder="What is the anxious thought?" style="width:80%; height:80px; padding:10px; border-radius:10px;"></textarea>
-        <button class="btn btn-gold" onclick="triggerVault()">Analyze & Store</button>
+        <p style="opacity:0.7;">Write the thought that's looping:</p>
+        <textarea id="thought" placeholder="e.g. 'Everything is going wrong...'" style="width:100%; max-width:300px; height:100px; background:var(--card); border:1px solid var(--teal); color:white; border-radius:15px; padding:15px;"></textarea>
+        <button class="btn btn-gold" onclick="triggerVault()">Analyze & Secure in Vault</button>
         <button class="btn" onclick="show('home')">Back</button>
     </div>
 
@@ -129,57 +155,102 @@
     </nav>
 
     <script>
-        // NAVIGATION
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
         function show(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(id === 'sos') startBreathingText();
+            if(id === 'sos') initBreathing();
         }
 
         function closeTutorial() {
             document.getElementById('tutorial-overlay').style.display = 'none';
-            localStorage.setItem('safespace_user', 'true');
+            localStorage.setItem('safespace_ready', 'true');
         }
 
-        // SOS TEXT LOGIC
-        function startBreathingText() {
+        // SOS LOGIC
+        function initBreathing() {
             const txt = document.getElementById('b-text');
             setInterval(() => {
-                let s = new Date().getSeconds() % 12;
-                if (s < 5) txt.innerText = "Breathe In...";
-                else if (s < 7) txt.innerText = "Hold...";
+                let s = new Date().getSeconds() % 10;
+                if (s < 4) txt.innerText = "Breathe In...";
+                else if (s < 6) txt.innerText = "Hold...";
                 else txt.innerText = "Breathe Out...";
             }, 1000);
         }
 
         // GROUNDING LOGIC
-        let step = 5;
-        const prompts = ["SEE", "TOUCH", "HEAR", "SMELL", "TASTE"];
-        function nextStep() {
-            step--;
-            if(step < 1) { show('home'); step = 5; }
-            document.getElementById('g-desc').innerText = "Name " + step + " things you can " + prompts[5-step] + ".";
-            document.getElementById('g-count').innerText = step;
+        let gStep = 5;
+        const gPrompts = ["SEE", "TOUCH", "HEAR", "SMELL", "TASTE"];
+        function nextGrounding() {
+            gStep--;
+            if(gStep < 1) { show('home'); gStep = 5; return; }
+            document.getElementById('g-desc').innerText = "Name " + gStep + " things you can " + gPrompts[5-gStep] + ".";
+            document.getElementById('g-count').innerText = gStep;
         }
 
-        // ICE TIMER
+        // ICE DIVE LOGIC
         function startIceTimer() {
             let t = 15;
             const el = document.getElementById('timer');
             const interval = setInterval(() => {
                 t--; el.innerText = t;
-                if(t <= 0) { clearInterval(interval); el.innerText = "DONE"; alert("Vagus Nerve Reset Complete."); }
+                if(t <= 0) { clearInterval(interval); el.innerText = "RESET"; alert("Physiological reset complete."); }
             }, 1000);
         }
 
-        // VAULT (UPSELL)
+        // PATTERN GAME LOGIC
+        let score = 0; let timeLeft = 10; let gameInt;
+        function startPatternGame() {
+            score = 0; timeLeft = 10;
+            show('game');
+            genLevel();
+            clearInterval(gameInt);
+            gameInt = setInterval(() => {
+                timeLeft--;
+                document.getElementById('game-timer').innerText = timeLeft + "s";
+                if(timeLeft <= 0) { clearInterval(gameInt); alert("Game Over. Score: " + score); show('home'); }
+            }, 1000);
+        }
+
+        function genLevel() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+            const icons = ['▲', '■', '●', '◆', '★', '✖', '✚'];
+            const main = icons[Math.floor(Math.random()*icons.length)];
+            let diff = icons[Math.floor(Math.random()*icons.length)];
+            while(diff === main) diff = icons[Math.floor(Math.random()*icons.length)];
+            const win = Math.floor(Math.random()*9);
+            for(let i=0; i<9; i++) {
+                const c = document.createElement('div');
+                c.className = 'game-cell';
+                c.innerText = (i === win) ? diff : main;
+                c.onclick = () => {
+                    if(i === win) { playSound(880); score++; timeLeft++; genLevel(); }
+                    else { playSound(220); timeLeft -= 2; }
+                    document.getElementById('game-score').innerText = score;
+                };
+                grid.appendChild(c);
+            }
+        }
+
+        function playSound(freq) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
         function triggerVault() {
-            const email = prompt("SafeSpace Pro: Enter email to unlock the Resilience Vault & save your data ($4.99/mo):");
-            if(email) alert("Redirecting " + email + " to secure payment...");
+            const email = prompt("SafeSpace Pro: Enter email to unlock your Resilience Vault and sync history ($4.99/mo):");
+            if(email) alert("Connecting to Stripe for " + email + "...");
         }
 
         window.onload = () => {
-            if(localStorage.getItem('safespace_user')) document.getElementById('tutorial-overlay').style.display = 'none';
+            if(localStorage.getItem('safespace_ready')) document.getElementById('tutorial-overlay').style.display = 'none';
         }
     </script>
 </body>
