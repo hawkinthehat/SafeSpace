@@ -3,177 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeSpace - Anxiety Relief</title>
+    <title>SafeSpace | Instant Intervention</title>
     <style>
         :root {
-            --bg-color: #0a192f;
-            --nav-bg: #112240;
-            --accent-teal: #64ffda;
-            --text-color: #ccd6f6;
+            --bg: #0a192f;
+            --card: #112240;
+            --teal: #64ffda;
+            --red: #ff4d4d;
             --gold: #ffd700;
-            --error-red: #ff4d4d;
+            --text: #ccd6f6;
         }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: -apple-system, system-ui, sans-serif;
-            margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: sans-serif; 
+            margin: 0; 
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        /* NAVIGATION & SCREENS */
-        .screen {
-            display: none; flex-direction: column; align-items: center; 
-            justify-content: center; height: 90vh; padding: 20px; text-align: center;
-        }
-        .active { display: flex; animation: fadeIn 0.3s ease; }
+        .screen { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; min-height: 80vh; }
+        .active { display: flex; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* BUTTONS & TILES */
-        .btn {
-            background: var(--nav-bg); border: 1px solid var(--accent-teal);
-            color: var(--accent-teal); padding: 15px 25px; border-radius: 30px;
-            cursor: pointer; margin: 10px; font-size: 1rem; transition: 0.3s;
+        .btn { 
+            background: var(--card); 
+            border: 1px solid var(--teal); 
+            color: var(--teal); 
+            padding: 15px 25px; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            margin: 10px; 
+            width: 250px; 
+            font-weight: bold;
+            transition: 0.2s;
         }
-        .btn-sos { background: var(--error-red); color: white; border: none; font-weight: bold; width: 80%; }
-        
-        /* FEATURE: BREATHING */
-        .breathe-circle {
-            width: 180px; height: 180px; background: var(--accent-teal);
-            border-radius: 50%; opacity: 0.3; box-shadow: 0 0 40px var(--accent-teal);
-            animation: breathe 12s infinite ease-in-out;
+        .btn-sos { background: var(--red); color: white; border: none; font-size: 1.2rem; }
+        .btn-gold { border-color: var(--gold); color: var(--gold); }
+
+        /* BREATHING ANIMATION */
+        .breathe-circle { 
+            width: 150px; height: 150px; 
+            background: var(--teal); 
+            border-radius: 50%; 
+            opacity: 0.3; 
+            animation: breathe 12s infinite ease-in-out; 
         }
-        @keyframes breathe {
-            0%, 100% { transform: scale(0.7); opacity: 0.2; }
-            33%, 66% { transform: scale(1.2); opacity: 0.6; }
+        @keyframes breathe { 
+            0%, 100% { transform: scale(0.8); opacity: 0.2; } 
+            40%, 60% { transform: scale(1.4); opacity: 0.5; } 
         }
 
-        /* FEATURE: BODY MAP */
-        .hotspot { fill: transparent; stroke: var(--accent-teal); stroke-width: 1; cursor: pointer; }
-        .hotspot:hover { fill: rgba(100, 255, 218, 0.2); }
+        nav { 
+            position: sticky; bottom: 0; width: 100%; 
+            background: var(--card); display: flex; 
+            justify-content: space-around; padding: 15px 0;
+            border-top: 1px solid rgba(100, 255, 218, 0.1);
+        }
+        nav button { background: none; border: none; color: var(--text); cursor: pointer; opacity: 0.7; }
 
-        /* FEATURE: JAR */
-        .jar {
-            width: 120px; height: 180px; border: 3px solid rgba(255,255,255,0.1);
-            border-radius: 10px 10px 40px 40px; position: relative; cursor: pointer;
+        #tutorial-overlay {
+            position: fixed; inset: 0; background: var(--bg); z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px;
         }
-        .sparkle {
-            width: 6px; height: 6px; background: var(--accent-teal);
-            border-radius: 50%; position: absolute; box-shadow: 0 0 8px var(--accent-teal);
-        }
-
-        /* FEATURE: GAME */
-        #target {
-            width: 50px; height: 50px; background: var(--gold);
-            position: absolute; border-radius: 8px; box-shadow: 0 0 20px var(--gold);
-        }
-
-        nav {
-            height: 10vh; background: var(--nav-bg); display: flex;
-            justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        nav button { background: none; border: none; color: var(--text-color); opacity: 0.6; cursor: pointer; }
-        nav button.active-tab { color: var(--accent-teal); opacity: 1; }
     </style>
 </head>
 <body>
 
-    <div id="home" class="screen active">
-        <h1>SafeSpace</h1>
-        <button class="btn btn-sos" onclick="showScreen('sos')">HELP ME NOW</button>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
-            <button class="btn" onclick="showScreen('map')">Body Map</button>
-            <button class="btn" onclick="showScreen('jar')">Gratitude</button>
-            <button class="btn" onclick="showScreen('cbt')">Fact-Check</button>
-            <button class="btn" onclick="showScreen('game')">Distraction</button>
+    <div id="tutorial-overlay">
+        <h1 style="color: var(--teal);">SafeSpace</h1>
+        <p>This is your digital weighted blanket.</p>
+        <div style="text-align: left; margin: 20px 0;">
+            <p>🔴 <strong>SOS:</strong> Immediate panic help.</p>
+            <p>❄️ <strong>Reset:</strong> Physical "Dive Reflex" fix.</p>
+            <p>🧠 <strong>CBT:</strong> Fact-check anxious thoughts.</p>
         </div>
+        <button class="btn" onclick="closeTutorial()">Start Healing</button>
+    </div>
+
+    <div id="home" class="screen active">
+        <h1>Hello, Joe.</h1>
+        <p>How does your nervous system feel?</p>
+        <button class="btn btn-sos" onclick="show('sos')">SOS: I'M PANICKING</button>
+        <button class="btn" onclick="show('grounding')">5-4-3-2-1 Grounding</button>
+        <button class="btn" onclick="show('icedive')">Emergency Ice Reset ❄️</button>
+        <button class="btn" onclick="show('cbt')">Thought Fact-Checker</button>
     </div>
 
     <div id="sos" class="screen">
         <div class="breathe-circle"></div>
-        <h2 id="breathe-text" style="margin-top:40px;">Breathe In...</h2>
-        <button class="btn" onclick="showScreen('game')">I Can't Focus</button>
+        <h2 id="b-text">Breathe In...</h2>
+        <p>Follow the circle's expansion.</p>
+        <button class="btn" onclick="show('home')">I'm calmer now</button>
     </div>
 
-    <div id="map" class="screen">
-        <h3>Where is the tension?</h3>
-        <svg viewBox="0 0 100 200" style="width:180px; fill:var(--nav-bg); stroke:var(--accent-teal);">
-            <circle class="hotspot" cx="50" cy="30" r="15" onclick="alert('Release your jaw and drop your shoulders.')"/>
-            <rect class="hotspot" x="35" y="50" width="30" height="60" rx="5" onclick="alert('Focus on slow, deep belly breaths.')"/>
-        </svg>
-        <button class="btn" onclick="showScreen('home')">Done</button>
+    <div id="grounding" class="screen">
+        <h2 id="g-title">Grounding</h2>
+        <p id="g-desc" style="font-size: 1.3rem; color: var(--teal);">Name 5 things you can SEE.</p>
+        <h1 id="g-count">5</h1>
+        <button class="btn" onclick="nextStep()">Next Sense</button>
     </div>
 
-    <div id="jar" class="screen">
-        <div class="jar" id="visual-jar" onclick="alert(memories.join('\n') || 'The jar is empty!')"></div>
-        <input type="text" id="g-input" placeholder="One small win..." style="margin-top:20px; padding:10px; border-radius:20px; border:none;">
-        <button class="btn" onclick="addGratitude()">Save Sparkle</button>
-        <button class="btn" onclick="showScreen('home')">Back</button>
+    <div id="icedive" class="screen">
+        <h2 style="color: #00f2ff;">System Reset</h2>
+        <p>Splash your face with ice water or hold an ice cube for 15 seconds.</p>
+        <h1 id="timer">15</h1>
+        <button class="btn" onclick="startIceTimer()">Start Timer</button>
+        <button class="btn" onclick="show('home')" style="border:none; opacity:0.5;">Cancel</button>
     </div>
 
     <div id="cbt" class="screen">
-        <h3>Fact-Checker</h3>
-        <p>Is this a fact or a feeling?</p>
-        <textarea id="thought" placeholder="Enter the anxious thought..." style="width:80%; height:60px; border-radius:10px; padding:10px;"></textarea>
-        <button class="btn" onclick="alert('Great work. Now name one piece of evidence that this thought is false.')">Check Thought</button>
-        <button class="btn" onclick="showScreen('home')">Back</button>
-    </div>
-
-    <div id="game" class="screen">
-        <p>Tap the gold square to stay present.</p>
-        <div id="target" onclick="moveTarget()"></div>
-        <button class="btn" onclick="showScreen('home')" style="position:fixed; bottom:100px;">Back</button>
+        <h2>Fact-Checker</h2>
+        <textarea id="thought" placeholder="What is the anxious thought?" style="width:80%; height:80px; padding:10px; border-radius:10px;"></textarea>
+        <button class="btn btn-gold" onclick="triggerVault()">Analyze & Store</button>
+        <button class="btn" onclick="show('home')">Back</button>
     </div>
 
     <nav>
-        <button onclick="showScreen('home')">Home</button>
-        <button onclick="showScreen('sos')">SOS</button>
-        <button onclick="showScreen('jar')">Jar</button>
+        <button onclick="show('home')">HOME</button>
+        <button onclick="show('sos')">SOS</button>
+        <button onclick="triggerVault()">VAULT 🔒</button>
     </nav>
 
     <script>
-        let memories = [];
-        let tapCount = 0;
-
-        function showScreen(id) {
+        // NAVIGATION
+        function show(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(id === 'sos') startBreathe();
-            if(id === 'game') moveTarget();
+            if(id === 'sos') startBreathingText();
         }
 
-        function startBreathe() {
-            const txt = document.getElementById('breathe-text');
+        function closeTutorial() {
+            document.getElementById('tutorial-overlay').style.display = 'none';
+            localStorage.setItem('safespace_user', 'true');
+        }
+
+        // SOS TEXT LOGIC
+        function startBreathingText() {
+            const txt = document.getElementById('b-text');
             setInterval(() => {
-                const s = new Date().getSeconds() % 12;
-                if(s < 4) txt.innerText = "Breathe In...";
-                else if(s < 8) txt.innerText = "Hold...";
+                let s = new Date().getSeconds() % 12;
+                if (s < 5) txt.innerText = "Breathe In...";
+                else if (s < 7) txt.innerText = "Hold...";
                 else txt.innerText = "Breathe Out...";
             }, 1000);
         }
 
-        function moveTarget() {
-            const t = document.getElementById('target');
-            t.style.left = Math.random() * (window.innerWidth - 60) + "px";
-            t.style.top = Math.random() * (window.innerHeight - 200) + "px";
-            tapCount++;
-            if(tapCount === 10) {
-                if(confirm("Focus is returning. Want to try a 1-minute breath now?")) showScreen('sos');
-            }
+        // GROUNDING LOGIC
+        let step = 5;
+        const prompts = ["SEE", "TOUCH", "HEAR", "SMELL", "TASTE"];
+        function nextStep() {
+            step--;
+            if(step < 1) { show('home'); step = 5; }
+            document.getElementById('g-desc').innerText = "Name " + step + " things you can " + prompts[5-step] + ".";
+            document.getElementById('g-count').innerText = step;
         }
 
-        function addGratitude() {
-            const val = document.getElementById('g-input').value;
-            if(!val) return;
-            memories.push(val);
-            const s = document.createElement('div');
-            s.className = 'sparkle';
-            s.style.left = Math.random() * 100 + "px";
-            s.style.top = Math.random() * 100 + 70 + "px";
-            document.getElementById('visual-jar').appendChild(s);
-            document.getElementById('g-input').value = "";
+        // ICE TIMER
+        function startIceTimer() {
+            let t = 15;
+            const el = document.getElementById('timer');
+            const interval = setInterval(() => {
+                t--; el.innerText = t;
+                if(t <= 0) { clearInterval(interval); el.innerText = "DONE"; alert("Vagus Nerve Reset Complete."); }
+            }, 1000);
+        }
+
+        // VAULT (UPSELL)
+        function triggerVault() {
+            const email = prompt("SafeSpace Pro: Enter email to unlock the Resilience Vault & save your data ($4.99/mo):");
+            if(email) alert("Redirecting " + email + " to secure payment...");
+        }
+
+        window.onload = () => {
+            if(localStorage.getItem('safespace_user')) document.getElementById('tutorial-overlay').style.display = 'none';
         }
     </script>
 </body>
 </html>
-
