@@ -2,58 +2,232 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Defuse | Tactical Neutralization</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DEFUSE | Tactical Neutralization</title>
     <style>
-        :root { --bg: #0f172a; --teal: #2dd4bf; --text: #f1f5f9; --card: #1e293b; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
-        .screen { display: none; min-height: 80vh; flex-direction: column; justify-content: center; align-items: center; }
-        .active { display: flex; }
-        .btn { background: var(--teal); color: var(--bg); border: none; padding: 20px; border-radius: 12px; width: 100%; max-width: 300px; font-weight: bold; font-size: 1.1rem; margin: 10px 0; cursor: pointer; }
-        .sos { background: #f43f5e; color: white; }
-        .task-box { background: var(--card); border: 2px solid var(--teal); padding: 30px; border-radius: 15px; margin: 20px; font-size: 1.4rem; line-height: 1.4; }
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --teal: #2dd4bf;
+            --red: #f43f5e;
+            --gold: #fbbf24;
+            --purple: #a78bfa;
+            --text: #f1f5f9;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: -apple-system, system-ui, sans-serif; 
+            margin: 0; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 20px 100px 20px;
+        }
+
+        .screen { display: none; width: 100%; max-width: 400px; flex-direction: column; align-items: center; text-align: center; }
+        .active { display: flex; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        h1 { color: var(--teal); letter-spacing: 4px; font-weight: 900; margin-top: 10px; text-transform: uppercase; }
+        p { opacity: 0.8; line-height: 1.6; font-size: 0.95rem; }
+
+        .btn { 
+            background: var(--card); 
+            border: 2px solid var(--teal); 
+            color: var(--teal); 
+            padding: 18px; 
+            border-radius: 12px; 
+            width: 100%; 
+            margin: 8px 0; 
+            font-size: 1rem; 
+            font-weight: bold; 
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-sos { background: var(--red); border: none; color: white; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3); }
+        .btn-gold { border-color: var(--gold); color: var(--gold); }
+        .btn-emdr { border-color: var(--purple); color: var(--purple); }
+
+        /* INTRO/ONBOARDING BOX */
+        .intro-box {
+            background: rgba(45, 212, 191, 0.05);
+            border-left: 3px solid var(--teal);
+            padding: 20px;
+            text-align: left;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        /* BREATHING CIRCLE */
+        .breath-container { height: 200px; display: flex; align-items: center; justify-content: center; margin: 20px 0; }
+        .breath-circle {
+            width: 70px; height: 70px;
+            background-color: var(--teal);
+            border-radius: 50%;
+            box-shadow: 0 0 30px var(--teal);
+            animation: breathe-animation 8s infinite ease-in-out;
+        }
+        @keyframes breathe-animation {
+            0%, 100% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(2.8); opacity: 0.9; }
+        }
+
+        /* EMDR SCANNER */
+        .emdr-track {
+            width: 100%; height: 80px;
+            background: var(--card);
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            margin: 40px 0;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .emdr-dot {
+            width: 35px; height: 35px;
+            background: var(--purple);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--purple);
+            position: absolute;
+            left: 10px;
+            animation: scan 3s infinite ease-in-out;
+        }
+        @keyframes scan {
+            0%, 100% { left: 10px; }
+            50% { left: calc(100% - 45px); }
+        }
+
+        input { background: var(--card); border: 2px solid var(--teal); color: white; font-size: 2.5rem; width: 100%; text-align: center; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        
+        nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #020617; display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid rgba(45, 212, 191, 0.1); z-index: 100; }
+        .nav-btn { background: none; border: none; color: var(--text); opacity: 0.5; font-size: 0.8rem; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="home" class="screen active">
-        <h1 style="color: var(--teal); letter-spacing: 4px;">DEFUSE</h1>
-        <button class="btn sos" onclick="show('sos')">SOS: BREATHING</button>
-        <button class="btn" onclick="nextTask()">START NEURAL HIJACK</button>
-        <button class="btn" onclick="show('ice')" style="background:none; color:var(--teal); border: 1px solid var(--teal);">ICE RESET</button>
+    <div id="intro" class="screen active">
+        <h1>DEFUSE</h1>
+        <p>Tactical Neutralization Protocol</p>
+        <div class="intro-box">
+            <p><strong>01. SOS:</strong> Pulse regulation via box-breathing.</p>
+            <p><strong>02. SCAN:</strong> EMDR-style bilateral stimulation.</p>
+            <p><strong>03. SHIELD:</strong> Logical brain engagement.</p>
+            <p><strong>04. VISE:</strong> Nervous system tension reset.</p>
+            <p><strong>05. ANCHOR:</strong> Sensory grounding hunt.</p>
+        </div>
+        <button class="btn" onclick="nav('home')">Initialize System</button>
     </div>
 
-    <div id="hijack" class="screen">
-        <h2 style="color: var(--teal);">TASK IN PROGRESS</h2>
-        <div class="task-box" id="task-display">Focus on the prompt below.</div>
-        <button class="btn" onclick="nextTask()">NEXT TASK</button>
-        <button class="btn" onclick="show('home')" style="background:none; color:white; font-size: 0.8rem;">I FEEL STABLE</button>
+    <div id="home" class="screen">
+        <h1>READY</h1>
+        <p style="opacity: 0.5;">Choose your defense.</p>
+        <button class="btn btn-sos" onclick="nav('sos')">SOS: BREATHING</button>
+        <button class="btn btn-emdr" onclick="nav('emdr')">HORIZON SCAN (EMDR)</button>
+        <button class="btn btn-gold" onclick="startMath()">MATH SHIELD 🛡️</button>
+        <button class="btn" onclick="nav('vise')">THE VISE (Tension)</button>
+        <button class="btn" onclick="nav('ground')">SENSORY ANCHOR</button>
     </div>
 
-    <div id="sos" class="screen"><h2>Breathe Deeply...</h2><button class="btn" onclick="show('home')">BACK</button></div>
-    <div id="ice" class="screen"><h2>Apply Ice Now</h2><button class="btn" onclick="show('home')">BACK</button></div>
+    <div id="sos" class="screen">
+        <h1>BREATHE</h1>
+        <div class="breath-container"><div class="breath-circle"></div></div>
+        <h2 id="b-text" style="color: var(--teal); letter-spacing: 2px;">INHALING...</h2>
+        <button class="btn" onclick="nav('home')">STABILIZED</button>
+    </div>
+
+    <div id="emdr" class="screen">
+        <h1 style="color: var(--purple);">SCAN</h1>
+        <p>Keep head still. Follow the dot with your eyes.</p>
+        <div class="emdr-track"><div class="emdr-dot"></div></div>
+        <button class="btn btn-emdr" onclick="nav('home')">DONE</button>
+    </div>
+
+    <div id="math" class="screen">
+        <h1>SHIELD</h1>
+        <h2 id="math-problem" style="font-size: 3.5rem; margin: 20px 0;">-- + --</h2>
+        <input type="number" id="math-answer" pattern="\d*" inputmode="numeric" placeholder="?">
+        <button class="btn" onclick="checkMath()">SUBMIT</button>
+    </div>
+
+    <div id="vise" class="screen">
+        <h1 style="color: var(--gold);">THE VISE</h1>
+        <p>Clench EVERY muscle. Hold the tension.</p>
+        <h1 id="v-timer" style="font-size: 5.5rem; color: var(--gold); font-weight: 900;">10</h1>
+        <button class="btn btn-gold" id="v-start" onclick="runViseTimer()">ENGAGE</button>
+        <button class="btn" onclick="nav('home')" style="border:none; opacity:0.5;">ABORT</button>
+    </div>
+
+    <div id="ground" class="screen">
+        <h1>ANCHOR</h1>
+        <p id="g-prompt">Identify 5 things you SEE.</p>
+        <h1 id="g-count" style="font-size: 5rem; font-weight: 900;">5</h1>
+        <button class="btn" onclick="nextAnchor()">NEXT</button>
+    </div>
+
+    <nav>
+        <button class="nav-btn" onclick="nav('intro')">GUIDE</button>
+        <button class="nav-btn" onclick="nav('home')">HOME</button>
+        <button class="nav-btn" onclick="alert('Defuse Pro: Syncing Vault... ($4.99/mo)')">VAULT 🔒</button>
+    </nav>
 
     <script>
-        const tasks = [
-            "Find 3 things in the room that are made of WOOD.",
-            "Say the alphabet backwards starting from Z.",
-            "Look for something that is exactly the color ORANGE.",
-            "Subtract 7 from 100... what is the number? (Do it again).",
-            "Name 5 cities you have never visited.",
-            "Touch 3 different textures (Soft, Hard, Cold).",
-            "Describe the pattern on the floor out loud."
-        ];
-
-        function show(id) {
+        let currentAns = 0;
+        function nav(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            if(id === 'sos') startBreathText();
         }
 
-        function nextTask() {
-            show('hijack');
-            const display = document.getElementById('task-display');
-            const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
-            display.innerText = randomTask;
+        function startBreathText() {
+            const txt = document.getElementById('b-text');
+            const upd = () => {
+                let s = Math.floor(Date.now() / 1000) % 8;
+                txt.innerText = (s < 4) ? "INHALING..." : "EXHALING...";
+            };
+            upd(); setInterval(upd, 1000);
+        }
+
+        function startMath() {
+            const n1 = Math.floor(Math.random() * 40) + 11;
+            const n2 = Math.floor(Math.random() * 40) + 11;
+            currentAns = n1 + n2;
+            document.getElementById('math-problem').innerText = n1 + " + " + n2;
+            document.getElementById('math-answer').value = "";
+            nav('math');
+        }
+
+        function checkMath() {
+            if(parseInt(document.getElementById('math-answer').value) === currentAns) {
+                alert("Logic Engaged. System Clear."); nav('home');
+            } else { alert("Incorrect. Focus."); document.getElementById('math-answer').value = ""; }
+        }
+
+        function runViseTimer() {
+            let t = 10;
+            const el = document.getElementById('v-timer');
+            const btn = document.getElementById('v-start');
+            btn.innerText = "HOLD..."; btn.disabled = true;
+            const int = setInterval(() => {
+                t--; el.innerText = t;
+                if(t <= 0) { clearInterval(int); el.innerText = "RELEASE"; btn.innerText = "RESET"; btn.disabled = false; alert("Drop all tension now."); }
+            }, 1000);
+        }
+
+        let step = 5;
+        const prompts = ["SEE", "TOUCH", "HEAR", "SMELL", "TASTE"];
+        function nextAnchor() {
+            step--;
+            if(step < 1) { step = 5; nav('home'); return; }
+            document.getElementById('g-prompt').innerText = "Identify " + step + " things you can " + prompts[5-step] + ".";
+            document.getElementById('g-count').innerText = step;
         }
     </script>
 </body>
